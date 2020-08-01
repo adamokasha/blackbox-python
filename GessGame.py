@@ -19,6 +19,7 @@ class BlackBoxGame:
     self._current_pos = None # (r, c)
     self._current_direction = None
     self._laser_trajectory = set()
+    self._hit_location = None
 
   def _check_valid_ray_origin(self, row, col):
     if (row == 0 or row == 9) and col in range(1,9): # top and bottom
@@ -37,11 +38,14 @@ class BlackBoxGame:
     self._current_pos = (row, col)
     self._traverse()
     self._laser_trajectory.add(self._current_pos)
-    while not self._check_valid_ray_origin(self._current_pos[0],self._current_pos[1]):
+    while not self._check_valid_ray_origin(self._current_pos[0],self._current_pos[1]) and not self._hit_location:
       self._laser_trajectory.add(self._current_pos)
       scan = self._get_scan_method()
       scan()
       self._traverse()
+    if self._hit_location:
+      return None
+    return self._current_pos
     
     
   def _set_initial_direction(self, origin_row, origin_col):
@@ -66,6 +70,12 @@ class BlackBoxGame:
       self._current_pos = (current_row, current_col + 1)
     else: # west
       self._current_pos = (current_row, current_col - 1)
+    # hit registered
+    new_row = self._current_pos[0]
+    new_col = self._current_pos[1]
+    board = self._board
+    if board[new_row][new_col] == 'o':
+      self._hit_location = self._current_pos
 
   def _get_scan_method(self):
     direction = self._current_direction
@@ -84,6 +94,7 @@ class BlackBoxGame:
     current_col = self._current_pos[1]
     north_west = None
     north_east = None
+    next_pos = None
     
     if self._check_within_board(current_row - 1, current_col - 1):
       north_west = self._board[current_row - 1][current_col - 1]
@@ -91,13 +102,16 @@ class BlackBoxGame:
     if self._check_within_board(current_row - 1, current_col + 1):
       north_east = self._board[current_row - 1][current_col + 1]
 
-    if north_west == 'o' and north_east == 'o':
+    if self._check_within_board(current_row - 1, current_col):
+      next_pos = self._board[current_row - 1][current_col]
+
+    if north_west == 'o' and north_east == 'o' and next_pos != 'o':
       self._current_direction = 'south'
 
-    if north_west == 'o' and (north_east == '' or not north_east):
+    if north_west == 'o' and (north_east == '' or not north_east) and next_pos != 'o':
       self._current_direction = 'east'
     
-    if north_east == 'o' and (north_west == '' or not north_west):
+    if north_east == 'o' and (north_west == '' or not north_west) and next_pos != 'o':
       self._current_direction = 'west'
 
   def _scan_south_and_compute_direction(self):
@@ -105,6 +119,7 @@ class BlackBoxGame:
     current_col = self._current_pos[1]
     south_west = None
     south_east = None
+    next_pos = None
     
     if self._check_within_board(current_row + 1, current_col - 1):
       south_west = self._board[current_row + 1][current_col - 1]
@@ -112,13 +127,16 @@ class BlackBoxGame:
     if self._check_within_board(current_row + 1, current_col + 1):
       south_east = self._board[current_row + 1][current_col + 1]
 
-    if south_west == 'o' and south_east == 'o':
+    if self._check_within_board(current_row + 1,current_col):
+      next_pos = self._board[current_row + 1][current_col] 
+
+    if south_west == 'o' and south_east == 'o' and next_pos != 'o':
       self._current_direction = 'north'
 
-    if south_west == 'o' and (south_east == '' or not south_east):
+    if south_west == 'o' and (south_east == '' or not south_east) and next_pos != 'o':
       self._current_direction = 'east'
     
-    if south_east == 'o' and (south_west == '' or not south_west):
+    if south_east == 'o' and (south_west == '' or not south_west) and next_pos != 'o':
       self._current_direction = 'west'
 
   def _scan_east_and_compute_direction(self):
@@ -126,6 +144,7 @@ class BlackBoxGame:
     current_col = self._current_pos[1]
     north_east = None
     south_east = None
+    next_pos = None
     
     if self._check_within_board(current_row - 1, current_col + 1):
       north_east = self._board[current_row - 1][current_col + 1]
@@ -133,13 +152,16 @@ class BlackBoxGame:
     if self._check_within_board(current_row + 1, current_col + 1):
       south_east = self._board[current_row + 1][current_col + 1]
 
-    if north_east == 'o' and south_east == 'o':
+    if self._check_within_board(current_row, current_col + 1):
+      next_pos = self._board[current_row][current_col + 1]
+
+    if north_east == 'o' and south_east == 'o' and next_pos != 'o':
       self._current_direction = 'west'
 
-    if north_east == 'o' and (south_east == '' or not south_east):
+    if north_east == 'o' and (south_east == '' or not south_east) and next_pos != 'o':
       self._current_direction = 'south'
     
-    if south_east == 'o' and (north_east == '' or not north_east):
+    if south_east == 'o' and (north_east == '' or not north_east) and next_pos != 'o':
       self._current_direction = 'north'
 
   def _scan_west_and_compute_direction(self):
@@ -147,20 +169,24 @@ class BlackBoxGame:
     current_col = self._current_pos[1]
     north_west = None
     south_west = None
+    next_pos = None
     
     if self._check_within_board(current_row - 1, current_col - 1):
       north_west = self._board[current_row - 1][current_col - 1]
 
     if self._check_within_board(current_row + 1, current_col - 1):
       south_west = self._board[current_row + 1][current_col - 1]
+    
+    if self._check_within_board(current_row, current_col + 1):
+      next_pos = self._board[current_row][current_col - 1]
 
-    if north_west == 'o' and south_west == 'o':
+    if north_west == 'o' and south_west == 'o' and next_pos != 'o':
       self._current_direction = 'east'
 
-    if north_west == 'o' and (south_west == '' or not south_west):
+    if north_west == 'o' and (south_west == '' or not south_west) and next_pos != 'o':
       self._current_direction = 'south'
     
-    if south_west == 'o' and (north_west == '' or not north_west):
+    if south_west == 'o' and (north_west == '' or not north_west) and next_pos != 'o':
       self._current_direction = 'north'
 
 
@@ -193,7 +219,10 @@ class BlackBoxGame:
       print(pretty_row)
 
 
-game = BlackBoxGame([(7,7),(7,8)])
-game.shoot_ray(0,8)
-game.print_board()    
+# game = BlackBoxGame([(7,7)])
+# game = BlackBoxGame([(5,3),(6,3),(7,3)])
+# game = BlackBoxGame([(7,6),(7,7),(7,8)])
+# game = BlackBoxGame([(2,6),(7,6), (7, 8)])
+# print(game.shoot_ray(3,9))
+# game.print_board()    
 # print(game._laser_trajectory)
