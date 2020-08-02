@@ -164,6 +164,32 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertEqual(north_shot, (0, 6))
     self.assertEqual(east_shot, (7, 9))
 
+  def test_twisted_trajectory(self):
+    game = BlackBoxGame([(3,2), (3,7), (6,4), (8, 7)])
+
+    west_shot = game.shoot_ray(5, 0)
+    # game.print_board()
+
+    self.assertEqual(west_shot, (9,5))
+
+  def test_deflection_and_reflection(self):
+    game = BlackBoxGame([(2,6), (7,6), (7, 8)])
+
+    east_shot = game.shoot_ray(3, 9)
+    # game.print_board()
+
+    self.assertEqual(east_shot,(3,9))
+
+  def test_deflect_and_hit(self):
+    game = BlackBoxGame([(2,6), (3,3), (7,6)])
+
+    west_shot = game.shoot_ray(6,0)
+    # game.print_board()
+
+    self.assertIsNone(west_shot)
+
+
+
 
 
 
