@@ -137,6 +137,38 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(seventh_column_shot)
     self.assertEqual(eighth_column_shot, (9,8))
 
+  def test_double_deflection(self):
+    game = BlackBoxGame([(6,4), (6,6)])
+
+    shot = game.shoot_ray(0, 5)
+    # game.print_board()
+
+    self.assertEqual(shot, (0,5))
+
+  def test_miss(self):
+    game = BlackBoxGame([(6,4), (6,6)])
+
+    shot = game.shoot_ray(1, 9)
+    # game.print_board()
+
+    self.assertEqual(shot, (1, 0))
+
+  def test_detour(self):
+    game = BlackBoxGame([(3,2), (3,7), (8, 7)])
+
+    north_shot = game.shoot_ray(0, 3)
+    # game.print_board()
+    east_shot = game.shoot_ray(4, 9)
+    # game.print_board()
+
+    self.assertEqual(north_shot, (0, 6))
+    self.assertEqual(east_shot, (7, 9))
+
+
+
+
+
+
 
 if __name__ == '__main__':
   unittest.main()
