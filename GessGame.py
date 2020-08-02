@@ -1,20 +1,32 @@
-class BlackBoxGame:
+class Board:
 
-  def __init__(self, atom_locations):
+  def __init__(self, rows, columns, atom_locations):
     board = []
     atom_locations_set = set() 
-    for x in range(0,10):
+    for x in range(0,rows):
       row = []
-      for y in range(0, 10):
+      for y in range(0, columns):
         if (x,y) in atom_locations:
           row.append('o')
           atom_locations_set.add((x,y))
         else:
           row.append('')
       board.append(row)
-
     self._board = board
     self._atom_locations = atom_locations_set
+
+  def get_board(self):
+    return list(self._board)
+
+  def get_atom_locations(self):
+    return set(self._atom_locations)
+
+class BlackBoxGame:
+
+  def __init__(self, atom_locations):
+    board = Board(10,10,atom_locations)
+    self._board = board.get_board()
+    self._atom_locations = board.get_atom_locations()
     self._points = 25
     self._guesses = set()
     self._entry_positions = set()
