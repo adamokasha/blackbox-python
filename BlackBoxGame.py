@@ -347,3 +347,5 @@ class BlackBoxGame:
 # game = BlackBoxGame([(2,6),(7,6), (7, 8)])
 # print(game.shoot_ray(3,9))
 # game.print_board()    
+# print(game.shoot_ray(4,9))
+# game.print_board()    
