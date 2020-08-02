@@ -22,6 +22,14 @@ class Board:
     return set(self._atom_locations)
 
   @staticmethod
+  def check_valid_ray_origin(board, row, col):
+    if (row == 0 or row == len(board) - 1) and col in range(1,len(board) - 1): # top and bottom
+      return True
+    if (col == 0 or col == len(board) - 1) and row in range(1,len(board) - 1): # sides
+      return True
+    return False
+
+  @staticmethod
   def check_within_board(row, col, side_length):
     if 1 <= row <= side_length and 1 <= col <= side_length:
       return True
@@ -260,18 +268,11 @@ class BlackBoxGame:
     self._laser_trajectory = set()
     self._hit_location = None
 
-  def _check_valid_ray_origin(self, row, col):
-    if (row == 0 or row == 9) and col in range(1,9): # top and bottom
-      return True
-    if (col == 0 or col == 9) and row in range(1,9): # sides
-      return True
-    return False
-
   def shoot_ray(self, row, col):
     self._hit_location = None
     self._laser.get_trajectory().clear()
 
-    if not self._check_valid_ray_origin(row, col):
+    if not Board.check_valid_ray_origin(self._board,row, col):
       return False
     if (row, col) not in self._entry_positions:
       self._entry_positions.add((row,col))
@@ -285,7 +286,7 @@ class BlackBoxGame:
 
     self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
     self._laser.get_trajectory().add(self._current_pos)
-    while not self._check_valid_ray_origin(self._current_pos[0],self._current_pos[1]) and not self._hit_location:
+    while not Board.check_valid_ray_origin(self._board, self._current_pos[0],self._current_pos[1]) and not self._hit_location:
       self._laser.get_trajectory().add(self._current_pos)
       self._laser.get_scan_method(self.get_current_direction)(self._board, self.get_current_pos, self.set_current_direction) # return correct scan method and invoke
       self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
@@ -296,6 +297,9 @@ class BlackBoxGame:
       self._exit_positions.add(exit_pos)
       self._points -= 1
     return self._current_pos
+
+  def get_board(self):
+    return self._board
 
   def get_current_direction(self):
     return self._current_direction
@@ -329,18 +333,7 @@ class BlackBoxGame:
 
   def set_hit_location(self, location):
     self._hit_location = location
-
-  def _check_within_board(self, row, col):
-    if 1 <= row <= 8 and 1 <= col <= 8:
-      return True
-    return False
       
-  def register_entry_position(self, row, col):
-    self._entry_positions.add((row, col))
-
-  def register_exit_position(self, row, col):
-    self._exit_positions.add((row, col))
-
   def print_board(self):
     Board.print_board(self._board, self._laser.get_trajectory())
 

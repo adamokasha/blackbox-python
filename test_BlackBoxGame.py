@@ -1,5 +1,6 @@
 import unittest
 from BlackBoxGame import BlackBoxGame
+from BlackBoxGame import Board
 
 class BlackBoxGameTest(unittest.TestCase):
 
@@ -16,7 +17,7 @@ class BlackBoxGameTest(unittest.TestCase):
     valid_test_results = []
 
     for origin in valid_origins:
-      valid_test_results.append(game._check_valid_ray_origin(origin[0], origin[1]))
+      valid_test_results.append(Board.check_valid_ray_origin(game.get_board(),origin[0], origin[1]))
 
     invalid_inner_origins = []
     for row in range(1,9):
@@ -25,12 +26,12 @@ class BlackBoxGameTest(unittest.TestCase):
 
     invalid_inner_test_results = []
     for origin in invalid_inner_origins:
-      invalid_inner_test_results.append(game._check_valid_ray_origin(origin[0], origin[1]))
+      invalid_inner_test_results.append(Board.check_valid_ray_origin(game.get_board(),origin[0], origin[1]))
 
     invalid_boundaries = [(12,12), (-1, -10), (0,0), (0,9), (9,0), (9,9)]
     invalid_boundaries_results = []
     for origin in invalid_boundaries:
-      invalid_boundaries_results.append(game._check_valid_ray_origin(origin[0], origin[1]))
+      invalid_boundaries_results.append(Board.check_valid_ray_origin(game.get_board(),origin[0], origin[1]))
 
 
     self.assertEqual(len(valid_origins), 32)
@@ -212,8 +213,8 @@ class BlackBoxGameTest(unittest.TestCase):
     game.shoot_ray(8,9)
     score_after_repeat_shot = game.get_score()
 
-    self.assertEqual(score_after_ray_shot, 19)
-    self.assertEqual(score_after_repeat_shot, 19)
+    self.assertEqual(score_after_ray_shot, 18)
+    self.assertEqual(score_after_repeat_shot, 18)
 
   def test_one_hit_one_miss(self):
     game = BlackBoxGame([(3,3)])
