@@ -2,18 +2,15 @@ class Board:
 
   def __init__(self, length, atom_locations):
     board = []
-    atom_locations_set = set() 
     for x in range(0, length):
       row = []
       for y in range(0, length):
         if (x,y) in atom_locations:
           row.append('o')
-          atom_locations_set.add((x,y))
         else:
           row.append('')
       board.append(row)
     self._board = board
-    self._atom_locations = atom_locations_set
 
   def get_board(self):
     return list(self._board)
@@ -255,9 +252,8 @@ class BlackBoxGame:
 
 
   def __init__(self, atom_locations):
-    board = Board(10, atom_locations)
-    self._board = board.get_board()
-    self._atom_locations = board.get_atom_locations()
+    self._board = Board(10, atom_locations).get_board()
+    self._atom_locations = set(atom_locations)
     self._laser = LaserController()
     self._points = 25
     self._guesses = set()
@@ -265,37 +261,33 @@ class BlackBoxGame:
     self._exit_positions = set()
     self._current_pos = None # (r, c)
     self._current_direction = None
-    self._laser_trajectory = set()
     self._hit_location = None
 
   def shoot_ray(self, row, col):
-    self._hit_location = None
-    self._laser.get_trajectory().clear()
+    self._reset_previous()
 
-    if not Board.check_valid_ray_origin(self._board,row, col):
+    if not self._in_ray_origin(row, col):
       return False
     if (row, col) not in self._entry_positions:
-      self._entry_positions.add((row,col))
-      self._points -= 1
+      self._add_new_entry_position(row, col)
 
-    self._current_direction = self._laser.set_initial_direction(row, col)
+    self._current_direction = self._set_initial_direction(row, col)
     self._current_pos = (row, col)
 
-    if self._laser.check_border_reflection(self._board, self.get_current_direction, self.get_current_pos, self.set_current_direction): # check for initial reflection
+    if self._check_border_reflection(): # check for initial reflection
       return self._current_pos
 
-    self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
-    self._laser.get_trajectory().add(self._current_pos)
-    while not Board.check_valid_ray_origin(self._board, self._current_pos[0],self._current_pos[1]) and not self._hit_location:
-      self._laser.get_trajectory().add(self._current_pos)
-      self._laser.get_scan_method(self.get_current_direction)(self._board, self.get_current_pos, self.set_current_direction) # return correct scan method and invoke
-      self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
+    self._traverse()
+    self._add_laser_trajectory()
+    while not self._in_ray_origin(self._current_pos[0],self._current_pos[1]) and not self._hit_location:
+      self._add_laser_trajectory()
+      self._scan_ahead() # returns correct scan method and invokes
+      self._traverse()
     if self._hit_location:
       return None
     exit_pos = self.get_current_pos()
     if exit_pos not in self._exit_positions:
-      self._exit_positions.add(exit_pos)
-      self._points -= 1
+      self._add_new_exit_position(exit_pos)
     return self._current_pos
 
   def get_board(self):
@@ -313,6 +305,15 @@ class BlackBoxGame:
   def set_current_pos(self, new_pos):
     self._current_pos = new_pos
 
+  def get_score(self):
+    return self._points
+
+  def atoms_left(self):
+    return len(self._atom_locations) - len(self._atom_locations.intersection(self._guesses)) 
+
+  def set_hit_location(self, location):
+    self._hit_location = location
+
   def guess_atom(self, row, col):
     if (row, col) in self._guesses:
       return self._board[row][col] == 'o'
@@ -324,16 +325,36 @@ class BlackBoxGame:
       self._points -= 5
       return False
 
-  def get_score(self):
-    return self._points
+  def _reset_previous(self):
+    self._hit_location = None
+    self._laser.get_trajectory().clear()
 
-  def atoms_left(self):
-    return len(self._atom_locations) - len(self._atom_locations.intersection(self._guesses)) 
+  def _set_initial_direction(self, row, col):
+    return self._laser.set_initial_direction(row, col)
 
+  def _add_new_entry_position(self, row, col):
+    self._entry_positions.add((row,col))
+    self._points -= 1
 
-  def set_hit_location(self, location):
-    self._hit_location = location
+  def _add_new_exit_position(self, exit_pos):
+    self._exit_positions.add(exit_pos)
+    self._points -= 1
+
+  def _in_ray_origin(self, row, col):
+    return Board.check_valid_ray_origin(self._board, row, col)
+
+  def _check_border_reflection(self):
+    return self._laser.check_border_reflection(self._board, self.get_current_direction, self.get_current_pos, self.set_current_direction)
       
+  def _traverse(self):
+    self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
+
+  def _scan_ahead(self):
+    self._laser.get_scan_method(self.get_current_direction)(self._board, self.get_current_pos, self.set_current_direction)
+
+  def _add_laser_trajectory(self):
+    self._laser.get_trajectory().add(self._current_pos)
+
   def print_board(self):
     Board.print_board(self._board, self._laser.get_trajectory())
 
