@@ -1,5 +1,5 @@
 import unittest
-from GessGame import BlackBoxGame
+from BlackBoxGame import BlackBoxGame
 
 class BlackBoxGameTest(unittest.TestCase):
 
@@ -214,6 +214,20 @@ class BlackBoxGameTest(unittest.TestCase):
 
     self.assertEqual(score_after_ray_shot, 19)
     self.assertEqual(score_after_repeat_shot, 19)
+
+  def test_one_hit_one_miss(self):
+    game = BlackBoxGame([(3,3)])
+
+    hit = game.shoot_ray(3,0)
+    # game.print_board()
+    miss = game.shoot_ray(1,0)
+    # game.print_board()
+
+    score = game.get_score()
+
+    self.assertIsNone(hit)
+    self.assertEqual(miss, (1, 9))
+    self.assertEqual(score, 23)
 
   def test_atoms_left(self):
     game = BlackBoxGame([(2,6), (3,3), (7,6)])
