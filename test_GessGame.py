@@ -189,6 +189,42 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(west_shot)
 
 
+  def test_get_score(self):
+    game = BlackBoxGame([(2,6), (3,3), (7,6)])
+
+    score = game.get_score()
+
+    self.assertEqual(score, 25)
+
+    game.guess_atom(2,7)
+    score_after_guess_one = game.get_score()
+
+    self.assertEqual(score_after_guess_one, 20)
+    game.guess_atom(2,7)
+    score_after_same_guess = game.get_score()
+
+    self.assertEqual(score_after_same_guess, 20)
+
+    game.shoot_ray(8,9)
+    # game.print_board()
+    score_after_ray_shot = game.get_score()
+
+    game.shoot_ray(8,9)
+    score_after_repeat_shot = game.get_score()
+
+    self.assertEqual(score_after_ray_shot, 19)
+    self.assertEqual(score_after_repeat_shot, 19)
+
+  def test_atoms_left(self):
+    game = BlackBoxGame([(2,6), (3,3), (7,6)])
+
+    game.guess_atom(2,6) # correct
+    game.guess_atom(3,3) # correct
+    game.guess_atom(1,2) # incorrect
+    
+    atoms_left = game.atoms_left()
+
+    self.assertEqual(atoms_left, 1)
 
 
 

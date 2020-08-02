@@ -2,18 +2,21 @@ class BlackBoxGame:
 
   def __init__(self, atom_locations):
     board = []
+    atom_locations_set = set() 
     for x in range(0,10):
       row = []
       for y in range(0, 10):
         if (x,y) in atom_locations:
           row.append('o')
+          atom_locations_set.add((x,y))
         else:
           row.append('')
       board.append(row)
 
     self._board = board
+    self._atom_locations = atom_locations_set
     self._points = 25
-    self._guesses = []
+    self._guesses = set()
     self._entry_positions = set()
     self._exit_positions = set()
     self._current_pos = None # (r, c)
@@ -35,27 +38,43 @@ class BlackBoxGame:
     if not self._check_valid_ray_origin(row, col):
       return False
     if (row, col) not in self._entry_positions:
+      self._entry_positions.add((row,col))
       self._points -= 1
 
     self._set_initial_direction(row, col)
     self._current_pos = (row, col)
 
-    # check for initial reflection
-    if self._check_reflection():
+    if self._check_border_reflection(): # check for initial reflection
       return self._current_pos
 
     self._traverse()
     self._laser_trajectory.add(self._current_pos)
     while not self._check_valid_ray_origin(self._current_pos[0],self._current_pos[1]) and not self._hit_location:
       self._laser_trajectory.add(self._current_pos)
-      scan = self._get_scan_method()
-      scan()
+      self._get_scan_method()() # return correct scan method and invoke
       self._traverse()
     if self._hit_location:
       return None
     return self._current_pos
 
-  def _check_reflection(self):
+  def guess_atom(self, row, col):
+    if (row, col) in self._guesses:
+      return self._board[row][col] == 'o'
+    if self._board[row][col] == 'o':
+      self._guesses.add((row, col))
+      return True
+    else:
+      self._guesses.add((row, col))
+      self._points -= 5
+      return False
+
+  def get_score(self):
+    return self._points
+
+  def atoms_left(self):
+    return len(self._atom_locations) - len(self._atom_locations.intersection(self._guesses)) 
+
+  def _check_border_reflection(self):
     if self._current_direction == 'east':
       north_east, south_east, east_pos = self._scan_east_and_compute_direction()
       if (north_east == 'o' or south_east == 'o') and east_pos != 'o':
