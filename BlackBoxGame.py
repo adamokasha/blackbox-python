@@ -291,6 +291,10 @@ class BlackBoxGame:
       self._laser._traverse(self._board, self.get_current_direction, self.get_current_pos, self.set_current_pos, self.set_hit_location)
     if self._hit_location:
       return None
+    exit_pos = self.get_current_pos()
+    if exit_pos not in self._exit_positions:
+      self._exit_positions.add(exit_pos)
+      self._points -= 1
     return self._current_pos
 
   def get_current_direction(self):

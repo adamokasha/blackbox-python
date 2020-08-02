@@ -219,15 +219,17 @@ class BlackBoxGameTest(unittest.TestCase):
     game = BlackBoxGame([(3,3)])
 
     hit = game.shoot_ray(3,0)
+    game.shoot_ray(3,0)
     # game.print_board()
     miss = game.shoot_ray(1,0)
+    game.shoot_ray(1,0)
     # game.print_board()
 
     score = game.get_score()
 
     self.assertIsNone(hit)
     self.assertEqual(miss, (1, 9))
-    self.assertEqual(score, 23)
+    self.assertEqual(score, 22)
 
   def test_atoms_left(self):
     game = BlackBoxGame([(2,6), (3,3), (7,6)])
