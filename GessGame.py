@@ -29,13 +29,21 @@ class BlackBoxGame:
     return False
 
   def shoot_ray(self, row, col):
+    self._hit_location = None
     self._laser_trajectory.clear()
+
     if not self._check_valid_ray_origin(row, col):
       return False
     if (row, col) not in self._entry_positions:
       self._points -= 1
+
     self._set_initial_direction(row, col)
     self._current_pos = (row, col)
+
+    # check for initial reflection
+    if self._check_reflection():
+      return self._current_pos
+
     self._traverse()
     self._laser_trajectory.add(self._current_pos)
     while not self._check_valid_ray_origin(self._current_pos[0],self._current_pos[1]) and not self._hit_location:
@@ -46,7 +54,27 @@ class BlackBoxGame:
     if self._hit_location:
       return None
     return self._current_pos
-    
+
+  def _check_reflection(self):
+    if self._current_direction == 'east':
+      north_east, south_east, east_pos = self._scan_east_and_compute_direction()
+      if (north_east == 'o' or south_east == 'o') and east_pos != 'o':
+        return True
+
+    if self._current_direction == 'west':
+      north_west, south_west, west = self._scan_west_and_compute_direction()
+      if (north_west == 'o' or south_west == 'o') and west != 'o':
+        return True
+
+    if self._current_direction == 'north':
+      north_west, north_east, north = self._scan_north_and_compute_direction()
+      if (north_west == 'o' or north_east == 'o') and north != 'o':
+        return True
+
+    if self._current_direction == 'south':
+      south_west, south_east, south = self._scan_south_and_compute_direction()
+      if (south_west == 'o' or south_east == 'o') and south != 'o':
+        return True
     
   def _set_initial_direction(self, origin_row, origin_col):
     if origin_row == 0:
@@ -90,6 +118,11 @@ class BlackBoxGame:
 
 
   def _scan_north_and_compute_direction(self):
+    """[summary]
+
+    Returns:
+        tuple: the items at (north_west, north_east, next_pos) 
+    """    
     current_row = self._current_pos[0]
     current_col = self._current_pos[1]
     north_west = None
@@ -113,8 +146,15 @@ class BlackBoxGame:
     
     if north_east == 'o' and (north_west == '' or not north_west) and next_pos != 'o':
       self._current_direction = 'west'
+    
+    return (north_west, north_east, next_pos)
 
   def _scan_south_and_compute_direction(self):
+    """[summary]
+
+    Returns:
+        tuple: the items at (south_west, south_east, next_pos)
+    """    
     current_row = self._current_pos[0]
     current_col = self._current_pos[1]
     south_west = None
@@ -138,8 +178,15 @@ class BlackBoxGame:
     
     if south_east == 'o' and (south_west == '' or not south_west) and next_pos != 'o':
       self._current_direction = 'west'
+    
+    return (south_west, south_east, next_pos)
 
   def _scan_east_and_compute_direction(self):
+    """[summary]
+
+    Returns:
+        tuple: the items at (north_east, south_east, next_pos)
+    """    
     current_row = self._current_pos[0]
     current_col = self._current_pos[1]
     north_east = None
@@ -154,7 +201,7 @@ class BlackBoxGame:
 
     if self._check_within_board(current_row, current_col + 1):
       next_pos = self._board[current_row][current_col + 1]
-
+    
     if north_east == 'o' and south_east == 'o' and next_pos != 'o':
       self._current_direction = 'west'
 
@@ -164,7 +211,14 @@ class BlackBoxGame:
     if south_east == 'o' and (north_east == '' or not north_east) and next_pos != 'o':
       self._current_direction = 'north'
 
+    return (north_east, south_east, next_pos)
+
   def _scan_west_and_compute_direction(self):
+    """[summary]
+
+    Returns:
+        tuple: the items at (north_west, south_west, next_pos)
+    """    
     current_row = self._current_pos[0]
     current_col = self._current_pos[1]
     north_west = None
@@ -177,7 +231,7 @@ class BlackBoxGame:
     if self._check_within_board(current_row + 1, current_col - 1):
       south_west = self._board[current_row + 1][current_col - 1]
     
-    if self._check_within_board(current_row, current_col + 1):
+    if self._check_within_board(current_row, current_col - 1):
       next_pos = self._board[current_row][current_col - 1]
 
     if north_west == 'o' and south_west == 'o' and next_pos != 'o':
@@ -188,6 +242,8 @@ class BlackBoxGame:
     
     if south_west == 'o' and (north_west == '' or not north_west) and next_pos != 'o':
       self._current_direction = 'north'
+    
+    return (north_west, south_west, next_pos)
 
 
   def _check_within_board(self, row, col):

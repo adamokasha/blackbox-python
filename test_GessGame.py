@@ -72,6 +72,71 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertEqual(east_north_shot, (0,3))
     self.assertEqual(east_south_shot, (9,3))
 
+  def test_west_border_reflection(self):
+    game = BlackBoxGame([(5,1),(6,1),(7,1)])
+
+    fourth_row_shot = game.shoot_ray(4,0)
+    fifth_row_shot = game.shoot_ray(5,0)
+    sixth_row_shot = game.shoot_ray(6,0)
+    seventh_row_shot = game.shoot_ray(7,0)
+    eighth_row_shot = game.shoot_ray(8,0)
+    # game.print_board()
+
+    self.assertEqual(fourth_row_shot, (4,0))
+    self.assertIsNone(fifth_row_shot)
+    self.assertIsNone(sixth_row_shot)
+    self.assertIsNone(seventh_row_shot)
+    self.assertEqual(eighth_row_shot, (8,0))
+
+  def test_east_border_reflection(self):
+    game = BlackBoxGame([(5,8),(6,8),(7,8)])
+
+    fourth_row_shot = game.shoot_ray(4,9)
+    fifth_row_shot = game.shoot_ray(5,9)
+    sixth_row_shot = game.shoot_ray(6,9)
+    seventh_row_shot = game.shoot_ray(7,9)
+    eighth_row_shot = game.shoot_ray(8,9)
+    # game.print_board()
+
+    self.assertEqual(fourth_row_shot, (4,9))
+    self.assertIsNone(fifth_row_shot)
+    self.assertIsNone(sixth_row_shot)
+    self.assertIsNone(seventh_row_shot)
+    self.assertEqual(eighth_row_shot, (8,9))
+
+  
+  def test_north_border_reflection(self):
+    game = BlackBoxGame([(1,5),(1,6),(1,7)])
+
+    fourth_column_shot = game.shoot_ray(0,4)
+    fifth_column_shot = game.shoot_ray(0,5)
+    sixth_column_shot = game.shoot_ray(0, 6)
+    seventh_column_shot = game.shoot_ray(0,7)
+    eighth_column_shot = game.shoot_ray(0,8)
+    # game.print_board()
+
+    self.assertEqual(fourth_column_shot, (0,4))
+    self.assertIsNone(fifth_column_shot)
+    self.assertIsNone(sixth_column_shot)
+    self.assertIsNone(seventh_column_shot)
+    self.assertEqual(eighth_column_shot, (0,8))
+
+  def test_south_border_reflection(self):
+    game = BlackBoxGame([(8,5),(8,6),(8,7)])
+
+    fourth_column_shot = game.shoot_ray(9,4)
+    fifth_column_shot = game.shoot_ray(9,5)
+    sixth_column_shot = game.shoot_ray(9, 6)
+    seventh_column_shot = game.shoot_ray(9,7)
+    eighth_column_shot = game.shoot_ray(9,8)
+    # game.print_board()
+
+    self.assertEqual(fourth_column_shot, (9,4))
+    self.assertIsNone(fifth_column_shot)
+    self.assertIsNone(sixth_column_shot)
+    self.assertIsNone(seventh_column_shot)
+    self.assertEqual(eighth_column_shot, (9,8))
+
 
 if __name__ == '__main__':
   unittest.main()
