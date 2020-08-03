@@ -94,7 +94,7 @@ class Board:
 
 class LaserController:
   """LaserController class contains trajectory data member that indicates the laser's trajectory. Contains methods
-  that scan the positions ahead of the laser's tip, change direction based on the orbs found by scanning ahead and
+  that scan the positions ahead of the laser's tip, change direction based on the atoms found by scanning ahead and
   performing traversal based on computed direction. 
   """  
   def __init__(self):
@@ -176,7 +176,7 @@ class LaserController:
         get_current_direction (function): passed from BlackBoxGame that gets the current direction
         get_current_pos (function): passed from BlackBoxGame that gets the current position as (row, col)
         set_current_pos (function): passed from BlackBoxGame that sets the current pos (row, col)
-        set_hit_location (function): passed from BlackBoxGame that sets the hit location (laser hitting orb)
+        set_hit_location (function): passed from BlackBoxGame that sets the hit location (laser hitting atom)
     """    
     direction = get_current_direction()
     current_row = get_current_pos()[0]
@@ -217,7 +217,7 @@ class LaserController:
 
 
   def _scan_north_and_compute_direction(self, board, get_current_pos, set_direction):
-    """Scans the positions north of the ray, sets the direction based on orbs ahead and returns
+    """Scans the positions north of the ray, sets the direction based on atoms ahead and returns
     a tuple showing what was found ahead ('o' or empty or None, None being outside of the inner board)
 
     Args:
@@ -255,7 +255,7 @@ class LaserController:
     return (north_west, north_east, next_pos)
 
   def _scan_south_and_compute_direction(self, board, get_current_pos, set_direction):
-    """Scans the positions south of the ray, sets the direction based on orbs ahead and returns
+    """Scans the positions south of the ray, sets the direction based on atoms ahead and returns
     a tuple showing what was found ahead ('o' or empty or None, None being outside of the inner board)
 
     Args:
@@ -293,7 +293,7 @@ class LaserController:
     return (south_west, south_east, next_pos)
 
   def _scan_east_and_compute_direction(self, board, get_current_pos, set_direction):
-    """Scans the positions east of the ray, sets the direction based on orbs ahead and returns
+    """Scans the positions east of the ray, sets the direction based on atoms ahead and returns
     a tuple showing what was found ahead ('o' or empty or None, None being outside of the inner board)
 
     Args:
@@ -331,7 +331,7 @@ class LaserController:
     return (north_east, south_east, next_pos)
 
   def _scan_west_and_compute_direction(self, board, get_current_pos, set_direction):
-    """Scans the positions west of the ray, sets the direction based on orbs ahead and returns
+    """Scans the positions west of the ray, sets the direction based on atoms ahead and returns
     a tuple showing what was found ahead ('o' or empty or None, None being outside of the inner board)
 
     Args:
@@ -482,7 +482,7 @@ class BlackBoxGame:
     return len(self._atom_locations) - len(self._atom_locations.intersection(self._guesses)) 
 
   def set_hit_location(self, location):
-    """Sets the location a hit on an orb occurred
+    """Sets the location a hit on an atom occurred
 
     Args:
         location (tuple): (row, col) tuple indicating the position
