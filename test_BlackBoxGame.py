@@ -243,6 +243,32 @@ class BlackBoxGameTest(unittest.TestCase):
 
     self.assertEqual(atoms_left, 1)
 
+  def test_insufficient_points_for_guess(self):
+    game = BlackBoxGame([(2,6)])
+
+    game.guess_atom(1,1)
+    game.guess_atom(1,2)
+    game.guess_atom(1,3)
+    game.guess_atom(1,4)
+    game.guess_atom(1,5)
+    message = game.guess_atom(1,6)
+
+    self.assertEqual(message, "Not enough points to make a guess!")
+
+  def test_insufficient_points_for_shot(self):
+    game = BlackBoxGame([(8,8)])
+    game.guess_atom(1,1)
+    game.guess_atom(2,1)
+    game.guess_atom(1,2)
+    game.guess_atom(1,3)
+    game.guess_atom(1,4)
+    game.guess_atom(1,5)
+
+
+    self.assertEqual(game.get_score(), 0)
+    message = game.shoot_ray(8,0)
+    self.assertEqual(message, "Not enough points to shoot from (8, 0)!")
+
 
 
 

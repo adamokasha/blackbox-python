@@ -257,19 +257,15 @@ class BlackBoxGame:
     self._laser = LaserController()
     self._points = 25
     self._guesses = set()
-    self._entry_positions = set()
-    self._exit_positions = set()
+    self._entry_exit_pairs = set()
     self._current_pos = None # (r, c)
     self._current_direction = None
     self._hit_location = None
 
   def shoot_ray(self, row, col):
     self._reset_previous()
-
     if not self._in_ray_origin(row, col):
       return False
-    if (row, col) not in self._entry_positions:
-      self._add_new_entry_position(row, col)
 
     self._current_direction = self._set_initial_direction(row, col)
     self._current_pos = (row, col)
@@ -284,10 +280,13 @@ class BlackBoxGame:
       self._scan_ahead() # returns correct scan method and invokes
       self._traverse()
     if self._hit_location:
+      if not self._has_enough_points((row, col), None):
+        return f"Not enough points to shoot from {str((row,col))}!"
+      self._handle_add_entry_exit_pair((row, col))
       return None
-    exit_pos = self.get_current_pos()
-    if exit_pos not in self._exit_positions:
-      self._add_new_exit_position(exit_pos)
+    if not self._has_enough_points((row, col), self.get_current_pos()): # args: entry, exit
+      return f"Not enough points to shoot from {str((row,col))}!"
+    self._handle_add_entry_exit_pair((row, col), self.get_current_pos())
     return self._current_pos
 
   def get_board(self):
@@ -315,6 +314,8 @@ class BlackBoxGame:
     self._hit_location = location
 
   def guess_atom(self, row, col):
+    if self._points < 5:
+      return "Not enough points to make a guess!"
     if (row, col) in self._guesses:
       return self._board[row][col] == 'o'
     if self._board[row][col] == 'o':
@@ -332,13 +333,21 @@ class BlackBoxGame:
   def _set_initial_direction(self, row, col):
     return self._laser.set_initial_direction(row, col)
 
-  def _add_new_entry_position(self, row, col):
-    self._entry_positions.add((row,col))
-    self._points -= 1
+  def _has_enough_points(self, entry_pos, exit_pos):
+    points_required = 0
+    if entry_pos not in self._entry_exit_pairs:
+      points_required += 1
+    if exit_pos not in self._entry_exit_pairs:
+      points_required += 1
+    return points_required < self._points
 
-  def _add_new_exit_position(self, exit_pos):
-    self._exit_positions.add(exit_pos)
-    self._points -= 1
+  def _handle_add_entry_exit_pair(self, entry_pos, exit_pos = None):
+    if entry_pos not in self._entry_exit_pairs:
+      self._points -= 1
+      self._entry_exit_pairs.add(entry_pos)
+    if exit_pos and exit_pos not in self._entry_exit_pairs:
+      self._points -= 1
+      self._entry_exit_pairs.add(exit_pos)
 
   def _in_ray_origin(self, row, col):
     return Board.check_valid_ray_origin(self._board, row, col)
