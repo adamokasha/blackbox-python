@@ -241,12 +241,3 @@ class BlackBoxGame:
     """    
     Board.print_board(self._board, self._laser.get_trajectory())
 
-
-# game = BlackBoxGame([(7,7)])
-# game = BlackBoxGame([(5,3),(6,3),(7,3)])
-# game = BlackBoxGame([(7,6),(7,7),(7,8)])
-# game = BlackBoxGame([(2,6),(7,6), (7, 8)])
-# print(game.shoot_ray(3,9))
-# game.print_board()    
-# print(game.shoot_ray(4,9))
-# game.print_board()    
