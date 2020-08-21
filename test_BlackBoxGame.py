@@ -1,6 +1,8 @@
 import unittest
+
+from Board import Board
+from LaserController import LaserController
 from BlackBoxGame import BlackBoxGame
-from BlackBoxGame import Board
 
 class BlackBoxGameTest(unittest.TestCase):
   """Unit tests for BlackBoxGame class
@@ -90,6 +92,7 @@ class BlackBoxGameTest(unittest.TestCase):
     sixth_row_shot = game.shoot_ray(6,0)
     seventh_row_shot = game.shoot_ray(7,0)
     eighth_row_shot = game.shoot_ray(8,0)
+    current_points = game.get_score()
     # game.print_board()
 
     self.assertEqual(fourth_row_shot, (4,0))
@@ -97,6 +100,7 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(sixth_row_shot)
     self.assertIsNone(seventh_row_shot)
     self.assertEqual(eighth_row_shot, (8,0))
+    self.assertEqual(current_points, 20)
 
   def test_east_border_reflection(self):
     """Test reflection between east ray origin and next position
@@ -108,6 +112,7 @@ class BlackBoxGameTest(unittest.TestCase):
     sixth_row_shot = game.shoot_ray(6,9)
     seventh_row_shot = game.shoot_ray(7,9)
     eighth_row_shot = game.shoot_ray(8,9)
+    current_points = game.get_score()
     # game.print_board()
 
     self.assertEqual(fourth_row_shot, (4,9))
@@ -115,6 +120,7 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(sixth_row_shot)
     self.assertIsNone(seventh_row_shot)
     self.assertEqual(eighth_row_shot, (8,9))
+    self.assertEqual(current_points, 20)
 
   
   def test_north_border_reflection(self):
@@ -127,6 +133,7 @@ class BlackBoxGameTest(unittest.TestCase):
     sixth_column_shot = game.shoot_ray(0, 6)
     seventh_column_shot = game.shoot_ray(0,7)
     eighth_column_shot = game.shoot_ray(0,8)
+    current_points = game.get_score()
     # game.print_board()
 
     self.assertEqual(fourth_column_shot, (0,4))
@@ -134,6 +141,7 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(sixth_column_shot)
     self.assertIsNone(seventh_column_shot)
     self.assertEqual(eighth_column_shot, (0,8))
+    self.assertEqual(current_points, 20)
 
   def test_south_border_reflection(self):
     """Test reflection between north ray origin and next position
@@ -145,6 +153,8 @@ class BlackBoxGameTest(unittest.TestCase):
     sixth_column_shot = game.shoot_ray(9, 6)
     seventh_column_shot = game.shoot_ray(9,7)
     eighth_column_shot = game.shoot_ray(9,8)
+    self.assertEqual(current_points, 20)
+    current_points = game.get_score()
     # game.print_board()
 
     self.assertEqual(fourth_column_shot, (9,4))
@@ -152,6 +162,7 @@ class BlackBoxGameTest(unittest.TestCase):
     self.assertIsNone(sixth_column_shot)
     self.assertIsNone(seventh_column_shot)
     self.assertEqual(eighth_column_shot, (9,8))
+    self.assertEqual(current_points, 20)
 
   def test_double_deflection(self):
     """Tests a double deflection scenario"""
