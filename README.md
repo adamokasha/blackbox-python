@@ -1,10 +1,10 @@
 # Black Box Game
 
-# About
+## About
 
 Implementation of a [Black Box Game](https://en.wikipedia.org/wiki/Black_Box_(game)) in Python. 
 
-# Usage
+## Usage
 
 ```
 game = BlackBoxGame([(5,3),(6,3),(7,3)])
