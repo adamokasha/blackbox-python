@@ -153,7 +153,6 @@ class BlackBoxGameTest(unittest.TestCase):
     sixth_column_shot = game.shoot_ray(9, 6)
     seventh_column_shot = game.shoot_ray(9,7)
     eighth_column_shot = game.shoot_ray(9,8)
-    self.assertEqual(current_points, 20)
     current_points = game.get_score()
     # game.print_board()
 
